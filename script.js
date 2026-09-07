@@ -1,217 +1,649 @@
-// =====================================================
+// =========================================================
 // PORTFOLIO JAVASCRIPT
-// =====================================================
+// =========================================================
+
+document.addEventListener("DOMContentLoaded", () => {
 
 
-// ================= NAVBAR SCROLL EFFECT =================
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
 
-const navbar = document.querySelector(".navbar");
+    const navbar =
+        document.querySelector(".navbar");
 
-window.addEventListener("scroll", () => {
+    const menuBtn =
+        document.getElementById("menuBtn");
 
-    if (window.scrollY > 50) {
-        navbar.style.background = "rgba(11, 11, 11, 0.97)";
-        navbar.style.borderBottomColor = "#333";
-    } else {
-        navbar.style.background = "rgba(11, 11, 11, 0.88)";
-        navbar.style.borderBottomColor = "#242424";
-    }
+    const navMenu =
+        document.querySelector(".nav-menu");
 
-});
+    const themeBtn =
+        document.getElementById("themeBtn");
+
+    const revealElements =
+        document.querySelectorAll(".reveal");
+
+    const counters =
+        document.querySelectorAll(".counter");
+
+    const filters =
+        document.querySelectorAll(".filter");
+
+    const projectCards =
+        document.querySelectorAll(".project-card");
+
+    const typingText =
+        document.querySelector(".typing-text");
+
+    const navLinks =
+        document.querySelectorAll(".nav-menu a");
+
+    const sections =
+        document.querySelectorAll("section[id]");
 
 
-// ================= SCROLL REVEAL =================
+    // =====================================================
+    // MOBILE MENU
+    // =====================================================
 
-const revealElements = document.querySelectorAll(
-    ".section-heading, .about-text, .education-card, .skill-card, .project-card, .contact-info, .contact-box"
-);
+    if (menuBtn && navMenu) {
 
-const revealObserver = new IntersectionObserver(
-    (entries, observer) => {
+        menuBtn.addEventListener("click", () => {
 
-        entries.forEach((entry) => {
+            navMenu.classList.toggle("open");
 
-            if (entry.isIntersecting) {
+            if (navMenu.classList.contains("open")) {
 
-                entry.target.classList.add("show");
+                menuBtn.textContent = "✕";
 
-                observer.unobserve(entry.target);
+            } else {
+
+                menuBtn.textContent = "☰";
 
             }
 
         });
 
-    },
-    {
-        threshold: 0.12
-    }
-);
 
+        navLinks.forEach(link => {
 
-revealElements.forEach((element) => {
+            link.addEventListener("click", () => {
 
-    element.classList.add("reveal");
+                navMenu.classList.remove("open");
 
-    revealObserver.observe(element);
+                menuBtn.textContent = "☰";
 
-});
-
-
-// ================= PROJECT CARD STAGGER =================
-
-const projectCards = document.querySelectorAll(".project-card");
-
-projectCards.forEach((card, index) => {
-
-    card.style.transitionDelay = `${index * 0.08}s`;
-
-});
-
-
-// ================= SKILL CARD STAGGER =================
-
-const skillCards = document.querySelectorAll(".skill-card");
-
-skillCards.forEach((card, index) => {
-
-    card.style.transitionDelay = `${index * 0.08}s`;
-
-});
-
-
-// ================= ACTIVE NAVIGATION =================
-
-const sections = document.querySelectorAll("section[id]");
-
-const navLinks = document.querySelectorAll(".nav-links a");
-
-window.addEventListener("scroll", () => {
-
-    let currentSection = "";
-
-    sections.forEach((section) => {
-
-        const sectionTop = section.offsetTop - 150;
-
-        const sectionHeight = section.offsetHeight;
-
-        if (
-            window.scrollY >= sectionTop &&
-            window.scrollY < sectionTop + sectionHeight
-        ) {
-
-            currentSection = section.getAttribute("id");
-
-        }
-
-    });
-
-
-    navLinks.forEach((link) => {
-
-        link.classList.remove("active");
-
-        if (
-            link.getAttribute("href") === `#${currentSection}`
-        ) {
-
-            link.classList.add("active");
-
-        }
-
-    });
-
-});
-
-
-// ================= SMOOTH NAVIGATION =================
-
-navLinks.forEach((link) => {
-
-    link.addEventListener("click", (event) => {
-
-        const targetId =
-            link.getAttribute("href");
-
-        const target =
-            document.querySelector(targetId);
-
-        if (target) {
-
-            event.preventDefault();
-
-            target.scrollIntoView({
-                behavior: "smooth"
             });
 
+        });
+
+    }
+
+
+    // =====================================================
+    // NAVBAR SCROLL
+    // =====================================================
+
+    function handleNavbar() {
+
+        if (window.scrollY > 50) {
+
+            navbar.classList.add("scrolled");
+
+        } else {
+
+            navbar.classList.remove("scrolled");
+
         }
+
+    }
+
+    window.addEventListener(
+        "scroll",
+        handleNavbar
+    );
+
+    handleNavbar();
+
+
+    // =====================================================
+    // SCROLL REVEAL
+    // =====================================================
+
+    const revealObserver =
+        new IntersectionObserver(
+            (entries) => {
+
+                entries.forEach(entry => {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add("show");
+
+                        revealObserver.unobserve(
+                            entry.target
+                        );
+
+                    }
+
+                });
+
+            },
+            {
+                threshold: 0.12
+            }
+        );
+
+
+    revealElements.forEach(element => {
+
+        revealObserver.observe(element);
 
     });
 
-});
+
+    // =====================================================
+    // COUNTER ANIMATION
+    // =====================================================
+
+    function animateCounter(counter) {
+
+        const target =
+            Number(counter.dataset.target);
+
+        const duration = 1200;
+
+        const startTime =
+            performance.now();
 
 
-// ================= EMAIL BUTTON =================
+        function updateCounter(currentTime) {
 
-const emailButtons =
-    document.querySelectorAll(
-        'a[href^="mailto:"]'
+            const progress =
+                Math.min(
+                    (currentTime - startTime) /
+                    duration,
+                    1
+                );
+
+
+            const easeOut =
+                1 - Math.pow(
+                    1 - progress,
+                    3
+                );
+
+
+            const current =
+                Math.floor(
+                    target * easeOut
+                );
+
+
+            counter.textContent = current;
+
+
+            if (progress < 1) {
+
+                requestAnimationFrame(
+                    updateCounter
+                );
+
+            } else {
+
+                counter.textContent =
+                    target;
+
+            }
+
+        }
+
+
+        requestAnimationFrame(
+            updateCounter
+        );
+
+    }
+
+
+    const counterObserver =
+        new IntersectionObserver(
+            (entries) => {
+
+                entries.forEach(entry => {
+
+                    if (entry.isIntersecting) {
+
+                        animateCounter(
+                            entry.target
+                        );
+
+                        counterObserver.unobserve(
+                            entry.target
+                        );
+
+                    }
+
+                });
+
+            },
+            {
+                threshold: 0.7
+            }
+        );
+
+
+    counters.forEach(counter => {
+
+        counterObserver.observe(counter);
+
+    });
+
+
+    // =====================================================
+    // PROJECT FILTERS
+    // =====================================================
+
+    filters.forEach(filter => {
+
+        filter.addEventListener("click", () => {
+
+
+            // Remove active class
+
+            filters.forEach(button => {
+
+                button.classList.remove(
+                    "active"
+                );
+
+            });
+
+
+            // Add active class
+
+            filter.classList.add("active");
+
+
+            // Get selected category
+
+            const selectedCategory =
+                filter.dataset.filter;
+
+
+            // Show / hide projects
+
+            projectCards.forEach(card => {
+
+                const category =
+                    card.dataset.category;
+
+
+                if (
+                    selectedCategory === "all" ||
+                    category === selectedCategory
+                ) {
+
+                    card.style.display = "block";
+
+                    setTimeout(() => {
+
+                        card.style.opacity = "1";
+
+                        card.style.transform =
+                            "translateY(0)";
+
+                    }, 50);
+
+                } else {
+
+                    card.style.opacity = "0";
+
+                    card.style.transform =
+                        "translateY(15px)";
+
+
+                    setTimeout(() => {
+
+                        card.style.display = "none";
+
+                    }, 250);
+
+                }
+
+            });
+
+        });
+
+    });
+
+
+    // =====================================================
+    // TYPING EFFECT
+    // =====================================================
+
+    if (typingText) {
+
+
+        const words = [
+            "Data Analyst",
+            "SQL Developer",
+            "BI Enthusiast",
+            "Data Explorer"
+        ];
+
+
+        let wordIndex = 0;
+
+        let letterIndex = 0;
+
+        let deleting = false;
+
+
+        function typeEffect() {
+
+            const currentWord =
+                words[wordIndex];
+
+
+            if (!deleting) {
+
+
+                typingText.textContent =
+                    currentWord.substring(
+                        0,
+                        letterIndex + 1
+                    );
+
+
+                letterIndex++;
+
+
+                if (
+                    letterIndex ===
+                    currentWord.length
+                ) {
+
+                    deleting = true;
+
+                    setTimeout(
+                        typeEffect,
+                        1500
+                    );
+
+                    return;
+
+                }
+
+            } else {
+
+
+                typingText.textContent =
+                    currentWord.substring(
+                        0,
+                        letterIndex - 1
+                    );
+
+
+                letterIndex--;
+
+
+                if (letterIndex === 0) {
+
+                    deleting = false;
+
+                    wordIndex =
+                        (
+                            wordIndex + 1
+                        ) %
+                        words.length;
+
+                }
+
+            }
+
+
+            const speed =
+                deleting
+                    ? 45
+                    : 80;
+
+
+            setTimeout(
+                typeEffect,
+                speed
+            );
+
+        }
+
+
+        typingText.textContent = "";
+
+        typeEffect();
+
+    }
+
+
+    // =====================================================
+    // ACTIVE NAVIGATION
+    // =====================================================
+
+    function updateActiveNav() {
+
+        let currentSection = "";
+
+
+        sections.forEach(section => {
+
+            const sectionTop =
+                section.offsetTop - 150;
+
+            const sectionHeight =
+                section.offsetHeight;
+
+
+            if (
+                window.scrollY >= sectionTop &&
+                window.scrollY <
+                sectionTop + sectionHeight
+            ) {
+
+                currentSection =
+                    section.getAttribute("id");
+
+            }
+
+        });
+
+
+        navLinks.forEach(link => {
+
+            link.classList.remove("active");
+
+
+            const href =
+                link.getAttribute("href");
+
+
+            if (
+                href ===
+                `#${currentSection}`
+            ) {
+
+                link.classList.add("active");
+
+            }
+
+        });
+
+    }
+
+
+    window.addEventListener(
+        "scroll",
+        updateActiveNav
     );
 
-emailButtons.forEach((button) => {
+    updateActiveNav();
 
-    button.addEventListener("click", () => {
 
-        console.log(
-            "Opening email client..."
+    // =====================================================
+    // THEME BUTTON
+    // =====================================================
+
+    if (themeBtn) {
+
+        themeBtn.addEventListener(
+            "click",
+            () => {
+
+                document.body.classList.toggle(
+                    "light-mode"
+                );
+
+
+                if (
+                    document.body.classList.contains(
+                        "light-mode"
+                    )
+                ) {
+
+                    themeBtn.textContent = "☀";
+
+                } else {
+
+                    themeBtn.textContent = "☾";
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // =====================================================
+    // PROJECT CARD MOUSE EFFECT
+    // =====================================================
+
+    projectCards.forEach(card => {
+
+
+        card.addEventListener(
+            "mousemove",
+            event => {
+
+                const rect =
+                    card.getBoundingClientRect();
+
+
+                const x =
+                    event.clientX -
+                    rect.left;
+
+
+                const y =
+                    event.clientY -
+                    rect.top;
+
+
+                const rotateX =
+                    (
+                        (y / rect.height) -
+                        0.5
+                    ) * -3;
+
+
+                const rotateY =
+                    (
+                        (x / rect.width) -
+                        0.5
+                    ) * 3;
+
+
+                card.style.transform =
+                    `
+                    perspective(800px)
+                    rotateX(${rotateX}deg)
+                    rotateY(${rotateY}deg)
+                    translateY(-8px)
+                    `;
+
+            }
+        );
+
+
+        card.addEventListener(
+            "mouseleave",
+            () => {
+
+                card.style.transform =
+                    `
+                    perspective(800px)
+                    rotateX(0)
+                    rotateY(0)
+                    translateY(0)
+                    `;
+
+            }
         );
 
     });
 
-});
 
+    // =====================================================
+    // ESC KEY
+    // =====================================================
 
-// ================= PHONE LINK =================
+    document.addEventListener(
+        "keydown",
+        event => {
 
-const phoneLink =
-    document.querySelector(
-        'a[href^="tel:"]'
-    );
+            if (event.key === "Escape") {
 
-if (phoneLink) {
+                if (navMenu) {
 
-    phoneLink.addEventListener(
-        "click",
-        () => {
+                    navMenu.classList.remove(
+                        "open"
+                    );
 
-            console.log(
-                "Opening phone application..."
-            );
+                }
+
+                if (menuBtn) {
+
+                    menuBtn.textContent = "☰";
+
+                }
+
+            }
 
         }
     );
 
-}
+
+    // =====================================================
+    // DEFAULT PROJECT VIEW
+    // =====================================================
+
+    projectCards.forEach(card => {
+
+        card.style.display = "block";
+
+        card.style.opacity = "1";
+
+        card.style.transform =
+            "translateY(0)";
+
+    });
 
 
-// ================= CURRENT YEAR =================
+    // =====================================================
+    // CONSOLE MESSAGE
+    // =====================================================
 
-const footer =
-    document.querySelector("footer");
+    console.log(
+        "Malik Ali Portfolio Loaded Successfully 🚀"
+    );
 
-if (footer) {
-
-    const year =
-        new Date().getFullYear();
-
-    const footerText =
-        footer.querySelector("p");
-
-    if (footerText) {
-
-        footerText.innerHTML =
-            `© ${year} Malik Muhammad Ali Aslam. All Rights Reserved.`;
-
-    }
-
-}
+});
