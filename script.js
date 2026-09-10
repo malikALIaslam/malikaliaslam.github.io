@@ -1,649 +1,330 @@
-// =========================================================
-// PORTFOLIO JAVASCRIPT
-// =========================================================
+/* =========================
+   CUSTOM CURSOR
+========================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+const cursorDot = document.querySelector(".cursor-dot");
+const cursorRing = document.querySelector(".cursor-ring");
+const cursorText = document.querySelector(".cursor-text");
 
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
 
-    // =====================================================
-    // ELEMENTS
-    // =====================================================
+let ringX = mouseX;
+let ringY = mouseY;
 
-    const navbar =
-        document.querySelector(".navbar");
+document.addEventListener("mousemove", function (event) {
 
-    const menuBtn =
-        document.getElementById("menuBtn");
+    mouseX = event.clientX;
+    mouseY = event.clientY;
 
-    const navMenu =
-        document.querySelector(".nav-menu");
-
-    const themeBtn =
-        document.getElementById("themeBtn");
-
-    const revealElements =
-        document.querySelectorAll(".reveal");
-
-    const counters =
-        document.querySelectorAll(".counter");
-
-    const filters =
-        document.querySelectorAll(".filter");
-
-    const projectCards =
-        document.querySelectorAll(".project-card");
-
-    const typingText =
-        document.querySelector(".typing-text");
-
-    const navLinks =
-        document.querySelectorAll(".nav-menu a");
-
-    const sections =
-        document.querySelectorAll("section[id]");
-
-
-    // =====================================================
-    // MOBILE MENU
-    // =====================================================
-
-    if (menuBtn && navMenu) {
-
-        menuBtn.addEventListener("click", () => {
-
-            navMenu.classList.toggle("open");
-
-            if (navMenu.classList.contains("open")) {
-
-                menuBtn.textContent = "✕";
-
-            } else {
-
-                menuBtn.textContent = "☰";
-
-            }
-
-        });
-
-
-        navLinks.forEach(link => {
-
-            link.addEventListener("click", () => {
-
-                navMenu.classList.remove("open");
-
-                menuBtn.textContent = "☰";
-
-            });
-
-        });
-
+    if (cursorDot) {
+        cursorDot.style.left = mouseX + "px";
+        cursorDot.style.top = mouseY + "px";
     }
 
+    if (cursorText) {
+        cursorText.style.left = mouseX + "px";
+        cursorText.style.top = mouseY + "px";
+    }
 
-    // =====================================================
-    // NAVBAR SCROLL
-    // =====================================================
+});
 
-    function handleNavbar() {
 
-        if (window.scrollY > 50) {
+function animateCursor() {
 
-            navbar.classList.add("scrolled");
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
 
-        } else {
+    if (cursorRing) {
+        cursorRing.style.left = ringX + "px";
+        cursorRing.style.top = ringY + "px";
+    }
 
-            navbar.classList.remove("scrolled");
+    requestAnimationFrame(animateCursor);
+
+}
+
+animateCursor();
+
+
+/* =========================
+   INTERACTIVE CURSOR
+========================= */
+
+const interactiveElements = document.querySelectorAll(
+    "[data-cursor], .project, .skill-row, .project-link, .button, .nav-resume, .resume-button, .contact-email, .contact-links a"
+);
+
+interactiveElements.forEach(function (element) {
+
+    element.addEventListener("mouseenter", function () {
+
+        document.body.classList.add("cursor-active");
+
+        const cursorValue = element.getAttribute("data-cursor");
+
+        if (cursorText) {
+
+            cursorText.textContent =
+                cursorValue ? cursorValue : "OPEN";
 
         }
 
+    });
+
+
+    element.addEventListener("mouseleave", function () {
+
+        document.body.classList.remove("cursor-active");
+
+        if (cursorText) {
+            cursorText.textContent = "VIEW";
+        }
+
+    });
+
+});
+
+
+/* =========================
+   NAVBAR SCROLL EFFECT
+========================= */
+
+const navbar = document.querySelector(".navbar");
+
+window.addEventListener("scroll", function () {
+
+    if (!navbar) {
+        return;
     }
 
-    window.addEventListener(
-        "scroll",
-        handleNavbar
+    if (window.scrollY > 50) {
+
+        navbar.classList.add("nav-scrolled");
+
+    } else {
+
+        navbar.classList.remove("nav-scrolled");
+
+    }
+
+});
+
+
+/* =========================
+   SCROLL REVEAL
+========================= */
+
+const revealElements = document.querySelectorAll(
+    ".section-heading, .about-grid, .skill-row, .project, .resume-section, .contact-grid"
+);
+
+if ("IntersectionObserver" in window) {
+
+    const revealObserver = new IntersectionObserver(
+        function (entries, observer) {
+
+            entries.forEach(function (entry) {
+
+                if (entry.isIntersecting) {
+
+                    entry.target.classList.add("revealed");
+
+                    observer.unobserve(entry.target);
+
+                }
+
+            });
+
+        },
+        {
+            threshold: 0.12
+        }
     );
 
-    handleNavbar();
 
+    revealElements.forEach(function (element) {
 
-    // =====================================================
-    // SCROLL REVEAL
-    // =====================================================
-
-    const revealObserver =
-        new IntersectionObserver(
-            (entries) => {
-
-                entries.forEach(entry => {
-
-                    if (entry.isIntersecting) {
-
-                        entry.target.classList.add("show");
-
-                        revealObserver.unobserve(
-                            entry.target
-                        );
-
-                    }
-
-                });
-
-            },
-            {
-                threshold: 0.12
-            }
-        );
-
-
-    revealElements.forEach(element => {
+        element.classList.add("reveal");
 
         revealObserver.observe(element);
 
     });
 
+} else {
 
-    // =====================================================
-    // COUNTER ANIMATION
-    // =====================================================
+    revealElements.forEach(function (element) {
 
-    function animateCounter(counter) {
-
-        const target =
-            Number(counter.dataset.target);
-
-        const duration = 1200;
-
-        const startTime =
-            performance.now();
-
-
-        function updateCounter(currentTime) {
-
-            const progress =
-                Math.min(
-                    (currentTime - startTime) /
-                    duration,
-                    1
-                );
-
-
-            const easeOut =
-                1 - Math.pow(
-                    1 - progress,
-                    3
-                );
-
-
-            const current =
-                Math.floor(
-                    target * easeOut
-                );
-
-
-            counter.textContent = current;
-
-
-            if (progress < 1) {
-
-                requestAnimationFrame(
-                    updateCounter
-                );
-
-            } else {
-
-                counter.textContent =
-                    target;
-
-            }
-
-        }
-
-
-        requestAnimationFrame(
-            updateCounter
-        );
-
-    }
-
-
-    const counterObserver =
-        new IntersectionObserver(
-            (entries) => {
-
-                entries.forEach(entry => {
-
-                    if (entry.isIntersecting) {
-
-                        animateCounter(
-                            entry.target
-                        );
-
-                        counterObserver.unobserve(
-                            entry.target
-                        );
-
-                    }
-
-                });
-
-            },
-            {
-                threshold: 0.7
-            }
-        );
-
-
-    counters.forEach(counter => {
-
-        counterObserver.observe(counter);
+        element.classList.add("revealed");
 
     });
 
-
-    // =====================================================
-    // PROJECT FILTERS
-    // =====================================================
-
-    filters.forEach(filter => {
-
-        filter.addEventListener("click", () => {
+}
 
 
-            // Remove active class
+/* =========================
+   PROJECT IMAGE FALLBACK
+========================= */
 
-            filters.forEach(button => {
+const projectImages = document.querySelectorAll(".project-image img");
 
-                button.classList.remove(
-                    "active"
-                );
+projectImages.forEach(function (image) {
 
-            });
+    image.addEventListener("error", function () {
 
+        image.style.display = "none";
 
-            // Add active class
+        const projectImage = image.closest(".project-image");
 
-            filter.classList.add("active");
+        if (!projectImage) {
+            return;
+        }
 
+        projectImage.classList.add("image-missing");
 
-            // Get selected category
+        if (!projectImage.querySelector(".image-placeholder")) {
 
-            const selectedCategory =
-                filter.dataset.filter;
+            const placeholder = document.createElement("div");
 
+            placeholder.className = "image-placeholder";
 
-            // Show / hide projects
+            placeholder.innerHTML = `
+                <span>DASHBOARD</span>
+                <strong>PROJECT VISUAL</strong>
+                <small>Add project screenshot here</small>
+            `;
 
-            projectCards.forEach(card => {
+            projectImage.appendChild(placeholder);
 
-                const category =
-                    card.dataset.category;
+        }
 
+    });
 
-                if (
-                    selectedCategory === "all" ||
-                    category === selectedCategory
-                ) {
-
-                    card.style.display = "block";
-
-                    setTimeout(() => {
-
-                        card.style.opacity = "1";
-
-                        card.style.transform =
-                            "translateY(0)";
-
-                    }, 50);
-
-                } else {
-
-                    card.style.opacity = "0";
-
-                    card.style.transform =
-                        "translateY(15px)";
+});
 
 
-                    setTimeout(() => {
+/* =========================
+   SMOOTH ANCHOR SCROLL
+========================= */
 
-                        card.style.display = "none";
+const anchorLinks = document.querySelectorAll('a[href^="#"]');
 
-                    }, 250);
+anchorLinks.forEach(function (link) {
 
-                }
+    link.addEventListener("click", function (event) {
 
-            });
+        const targetId = link.getAttribute("href");
 
+        if (!targetId || targetId === "#") {
+            return;
+        }
+
+        const target = document.querySelector(targetId);
+
+        if (!target) {
+            return;
+        }
+
+        event.preventDefault();
+
+        target.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
         });
 
     });
 
-
-    // =====================================================
-    // TYPING EFFECT
-    // =====================================================
-
-    if (typingText) {
+});
 
 
-        const words = [
-            "Data Analyst",
-            "SQL Developer",
-            "BI Enthusiast",
-            "Data Explorer"
-        ];
+/* =========================
+   PROJECT IMAGE PARALLAX
+========================= */
 
+const projects = document.querySelectorAll(".project");
 
-        let wordIndex = 0;
+projects.forEach(function (project) {
 
-        let letterIndex = 0;
+    const image = project.querySelector(".project-image img");
 
-        let deleting = false;
-
-
-        function typeEffect() {
-
-            const currentWord =
-                words[wordIndex];
-
-
-            if (!deleting) {
-
-
-                typingText.textContent =
-                    currentWord.substring(
-                        0,
-                        letterIndex + 1
-                    );
-
-
-                letterIndex++;
-
-
-                if (
-                    letterIndex ===
-                    currentWord.length
-                ) {
-
-                    deleting = true;
-
-                    setTimeout(
-                        typeEffect,
-                        1500
-                    );
-
-                    return;
-
-                }
-
-            } else {
-
-
-                typingText.textContent =
-                    currentWord.substring(
-                        0,
-                        letterIndex - 1
-                    );
-
-
-                letterIndex--;
-
-
-                if (letterIndex === 0) {
-
-                    deleting = false;
-
-                    wordIndex =
-                        (
-                            wordIndex + 1
-                        ) %
-                        words.length;
-
-                }
-
-            }
-
-
-            const speed =
-                deleting
-                    ? 45
-                    : 80;
-
-
-            setTimeout(
-                typeEffect,
-                speed
-            );
-
-        }
-
-
-        typingText.textContent = "";
-
-        typeEffect();
-
+    if (!image) {
+        return;
     }
 
 
-    // =====================================================
-    // ACTIVE NAVIGATION
-    // =====================================================
+    project.addEventListener("mousemove", function (event) {
 
-    function updateActiveNav() {
+        const rect = project.getBoundingClientRect();
 
-        let currentSection = "";
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
 
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
 
-        sections.forEach(section => {
+        const moveX = (x - centerX) / 35;
+        const moveY = (y - centerY) / 35;
 
-            const sectionTop =
-                section.offsetTop - 150;
-
-            const sectionHeight =
-                section.offsetHeight;
-
-
-            if (
-                window.scrollY >= sectionTop &&
-                window.scrollY <
-                sectionTop + sectionHeight
-            ) {
-
-                currentSection =
-                    section.getAttribute("id");
-
-            }
-
-        });
-
-
-        navLinks.forEach(link => {
-
-            link.classList.remove("active");
-
-
-            const href =
-                link.getAttribute("href");
-
-
-            if (
-                href ===
-                `#${currentSection}`
-            ) {
-
-                link.classList.add("active");
-
-            }
-
-        });
-
-    }
-
-
-    window.addEventListener(
-        "scroll",
-        updateActiveNav
-    );
-
-    updateActiveNav();
-
-
-    // =====================================================
-    // THEME BUTTON
-    // =====================================================
-
-    if (themeBtn) {
-
-        themeBtn.addEventListener(
-            "click",
-            () => {
-
-                document.body.classList.toggle(
-                    "light-mode"
-                );
-
-
-                if (
-                    document.body.classList.contains(
-                        "light-mode"
-                    )
-                ) {
-
-                    themeBtn.textContent = "☀";
-
-                } else {
-
-                    themeBtn.textContent = "☾";
-
-                }
-
-            }
-        );
-
-    }
-
-
-    // =====================================================
-    // PROJECT CARD MOUSE EFFECT
-    // =====================================================
-
-    projectCards.forEach(card => {
-
-
-        card.addEventListener(
-            "mousemove",
-            event => {
-
-                const rect =
-                    card.getBoundingClientRect();
-
-
-                const x =
-                    event.clientX -
-                    rect.left;
-
-
-                const y =
-                    event.clientY -
-                    rect.top;
-
-
-                const rotateX =
-                    (
-                        (y / rect.height) -
-                        0.5
-                    ) * -3;
-
-
-                const rotateY =
-                    (
-                        (x / rect.width) -
-                        0.5
-                    ) * 3;
-
-
-                card.style.transform =
-                    `
-                    perspective(800px)
-                    rotateX(${rotateX}deg)
-                    rotateY(${rotateY}deg)
-                    translateY(-8px)
-                    `;
-
-            }
-        );
-
-
-        card.addEventListener(
-            "mouseleave",
-            () => {
-
-                card.style.transform =
-                    `
-                    perspective(800px)
-                    rotateX(0)
-                    rotateY(0)
-                    translateY(0)
-                    `;
-
-            }
-        );
+        image.style.transform =
+            `scale(1.05) translate(${moveX}px, ${moveY}px)`;
 
     });
 
 
-    // =====================================================
-    // ESC KEY
-    // =====================================================
+    project.addEventListener("mouseleave", function () {
 
-    document.addEventListener(
-        "keydown",
-        event => {
+        image.style.transform =
+            "scale(1) translate(0, 0)";
 
-            if (event.key === "Escape") {
+    });
 
-                if (navMenu) {
-
-                    navMenu.classList.remove(
-                        "open"
-                    );
-
-                }
-
-                if (menuBtn) {
-
-                    menuBtn.textContent = "☰";
-
-                }
-
-            }
-
-        }
-    );
+});
 
 
-    // =====================================================
-    // DEFAULT PROJECT VIEW
-    // =====================================================
+/* =========================
+   SKILL ROW HOVER
+========================= */
 
-    projectCards.forEach(card => {
+const skillRows = document.querySelectorAll(".skill-row");
 
-        card.style.display = "block";
+skillRows.forEach(function (row) {
 
-        card.style.opacity = "1";
+    row.addEventListener("mouseenter", function () {
 
-        card.style.transform =
-            "translateY(0)";
+        row.classList.add("skill-active");
 
     });
 
 
-    // =====================================================
-    // CONSOLE MESSAGE
-    // =====================================================
+    row.addEventListener("mouseleave", function () {
 
-    console.log(
-        "Malik Ali Portfolio Loaded Successfully 🚀"
-    );
+        row.classList.remove("skill-active");
+
+    });
+
+});
+
+
+/* =========================
+   CURRENT YEAR
+========================= */
+
+const footerYear = document.querySelector(".footer-right");
+
+if (footerYear) {
+
+    footerYear.textContent =
+        "© " + new Date().getFullYear();
+
+}
+
+
+/* =========================
+   PAGE READY
+========================= */
+
+window.addEventListener("load", function () {
+
+    document.body.classList.add("page-loaded");
 
 });
